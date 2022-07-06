@@ -37,6 +37,7 @@ OF SUCH DAMAGE.
 
 #include "gd32f3x0_it.h"
 #include "systick.h"
+#include "config.h"
 
 /*!
     \brief      this function handles NMI exception
@@ -138,5 +139,15 @@ void PendSV_Handler(void)
 */
 void SysTick_Handler(void)
 {
-    delay_decrement();
+    uint8_t i = 0;
+		delay_decrement();
+		for(i = 0 ; i < MS_WAIT_TIMER; i++)
+		{
+				if(MS_TIMER[i] != 0)
+				{
+						MS_TIMER[i] --;
+						if(MS_TIMER[i] == 0)
+							MS_TIMER_MARK[i] = 1;
+				}
+		}
 }

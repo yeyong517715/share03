@@ -37,6 +37,17 @@ OF SUCH DAMAGE.
 #include "gd32f3x0.h"
 #include "gd32f350c_start.h"
 #include "systick.h"
+#include "led.h"
+#include "config.h"
+#include "gpio.h"
+
+
+
+
+
+/* 定义整个程序运行个功能时间数据 */
+uint32_t MS_TIMER[MS_WAIT_TIMER] ={0};
+uint8_t	MS_TIMER_MARK[MS_WAIT_TIMER] = {0};
 
 /*!
     \brief      main function
@@ -45,25 +56,42 @@ OF SUCH DAMAGE.
     \retval     none
 */
 int main(void)
-{
-    /* enable the led clock */
-    rcu_periph_clock_enable(RCU_GPIOF);
-    /* configure led GPIO port */ 
-    gpio_mode_set(GPIOF, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO_PIN_6 | GPIO_PIN_7);
-    gpio_output_options_set(GPIOF, GPIO_OTYPE_PP, GPIO_OSPEED_MAX, GPIO_PIN_6 | GPIO_PIN_7);
-
-    gpio_bit_reset(GPIOF, GPIO_PIN_6 | GPIO_PIN_7);
-
+{  
+		uint8_t i = 1;
+		share03_LED_Init();
     systick_config();
-
+		share03_GPIO_Init();
+		delay_1ms(2000);
+		Speak_medium;
+		delay_1ms(2000);
+		SY12V_ON;
+		FAN_ON;	
+		MS_TIMER[RUN_LED_TIMER] = RUN_LED_INIT_TIME;
     while(1){
-        /* insert 500 ms delay */
-        delay_1ms(500);
-
-        /* toggle the LED */ 
-        gpio_bit_toggle(GPIOF, GPIO_PIN_6 | GPIO_PIN_7);
-
-        /* insert 500 ms delay */
-        delay_1ms(500);
+        if(MS_TIMER_MARK[RUN_LED_TIMER])
+				{
+						MS_TIMER_MARK[RUN_LED_TIMER] = 0;
+						MS_TIMER[RUN_LED_TIMER] = RUN_LED_INIT_TIME;
+						Run_LED_Toggle;		
+						if(i%2)
+						{
+							LED0_R_Toggle;
+							LED1_R_Toggle;
+							LED2_R_Toggle;
+							LED3_R_Toggle;
+						}
+						else
+						{
+							LED0_W_Toggle;
+							LED1_W_Toggle;
+							LED2_W_Toggle;
+							LED3_W_Toggle;
+						}
+						i++;
+				}
+				
     }
 }
+
+
+
